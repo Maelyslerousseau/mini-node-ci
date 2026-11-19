@@ -1,69 +1,35 @@
 name: gitCI
-
 on:
-  push:
-    branches: ["main", "develop"]
-  pull_request:
-    branches: ["main", "develop"]
+    push:
+        branches: ["main", "develop"]
+    pull_request:
+        branches: ["main", "develop"]
 
 jobs:
-  build-test-analyze:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
-        with:
-          fetch-depth: 0
+    build-test-analyze:
+        runs-on: ubuntu-latest
 
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: '24'
-          cache: 'npm'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+                  cache: 'npm'
 
-      - name: Run tests
-        run: npm test
-        env:
-          NODE_OPTIONS: --experimental-vm-modules
+            - name: Install dependencies
+              run: npm ci
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@0d39f4bb54b98d8401e62d88b123ba63fb6c2e41 # v7.0.0
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}name: gitCI
+            - name: Run tests
+              run: npm test -- --coverage
+              env:
+                  NODE_OPTIONS: --experimental-vm-modules
 
-on:
-  push:
-    branches: ["main", "develop"]
-  pull_request:
-    branches: ["main", "develop"]
-
-jobs:
-  build-test-analyze:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
-
-      - name: Run tests
-        run: npm test
-        env:
-          NODE_OPTIONS: --experimental-vm-modules
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@b99117464e3e37a372f295e7590293d3f9e845c9 # remplacez par le SHA de v7 indiqué par SonarCloud si besoin
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            - name: SonarCloud Scan
+              uses: SonarSource/sonarqube-scan-action@v7
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
